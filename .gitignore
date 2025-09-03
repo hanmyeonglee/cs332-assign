@@ -1,1 +1,10 @@
-__vscode__
+# IDE settings
+.vscode/
+
+# by-products while building
+.bsp/
+.metals/
+.scala-build/
+
+# scala installation test code
+simple-scala-test/
