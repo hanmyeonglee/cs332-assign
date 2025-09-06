@@ -1,9 +1,8 @@
 # IDE settings
-.vscode/
+.idea/
 
 # by-products while building
 .bsp/
-.metals/
 .scala-build/
 
 # scala installation test code
