@@ -1,10 +1,21 @@
 # IDE settings
-.vscode/
+.idea/
 
 # by-products while building
+target/
+project/target/
+project/project/project/
+project/project/target/
+recitations/
+submission/
+lib_managed/
 .bsp/
 .metals/
-.scala-build/
+.ammonite/
+.ivy2/
+.cache/
+.coursier/
+*.class
 
 # scala installation test code
 simple-scala-test/
