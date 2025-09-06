@@ -51,10 +51,9 @@ object Main {
   /**
    * Exercise 3
    */
-  def countChange(money: Int, coins: List[Int]): Int = coins match {
-    case _ if money == 0 => 1
-    case _ if money < 0 => 0
-    case Nil => 0
-    case coin :: coins => countChange(money - coin, coin :: coins) + countChange(money, coins)
+  def countChange(money: Int, coins: List[Int]): Int = {
+    if (money == 0) 1
+    else if (money < 0 || coins.isEmpty) 0
+    else countChange(money - coins.head, coins) + countChange(money, coins.tail)
   }
 }
