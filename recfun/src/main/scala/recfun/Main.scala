@@ -24,9 +24,10 @@ object Main {
   /**
    * Exercise 1
    */
-  def pascal(c: Int, r: Int): Int = {
-    if (c == 0 || r == 0 || r == c) 1
-    else pascal(c - 1, r - 1) + pascal(c, r - 1)
+  def pascal(c: Int, r: Int): Int = (c, r) match {
+    case (0, 0) => 1
+    case (col, row) if col < 0 || col > row => 0
+    case (col, row) => pascal(col - 1, row - 1) + pascal(col, row - 1)
   }
 
   /**
