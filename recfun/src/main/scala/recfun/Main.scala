@@ -12,7 +12,7 @@ object Main {
       println()
     }
 
-    println(balance("((if (zero? x) max (/ 1 x))".toList))
+    println(balance("((if (zero? x) max (/ 1 x)))".toList))
     println(balance("I told him (that it's not (yet) done).\n(But he wasn't listening)".toList))
     println(balance(":-)".toList))
     println(balance("())(".toList))
@@ -24,7 +24,8 @@ object Main {
   /**
    * Exercise 1
    */
-  def pascal(c: Int, r: Int): Int = (c, r) match {
+  def pascal(c: Int, r: Int): Int =
+  (c, r) match {
     case (0, 0) => 1
     case (col, row) if col < 0 || col > row => 0
     case (col, row) => pascal(col - 1, row - 1) + pascal(col, row - 1)
@@ -50,10 +51,10 @@ object Main {
   /**
    * Exercise 3
    */
-  def countChange(money: Int, coins: List[Int]): Int = (money, coins) match {
-    case (0, _) => 1
-    case (money, _) if money < 0 => 0
-    case (_, Nil) => 0
-    case (money, c :: cs) => countChange(money - c, c :: cs) + countChange(money, cs)
+  def countChange(money: Int, coins: List[Int]): Int = coins match {
+    case _ if money == 0 => 1
+    case _ if money < 0 => 0
+    case Nil => 0
+    case coin :: coins => countChange(money - coin, coin :: coins) + countChange(money, coins)
   }
 }
