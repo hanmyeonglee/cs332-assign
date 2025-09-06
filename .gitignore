@@ -8,6 +8,7 @@ project/project/project/
 project/project/target/
 recitations/
 submission/
+lib_managed/
 .bsp/
 .metals/
 .ammonite/
