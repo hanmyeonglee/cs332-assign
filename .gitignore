@@ -4,6 +4,7 @@
 # by-products while building
 .bsp/
 .scala-build/
+*.class
 
 # scala installation test code
 simple-scala-test/
