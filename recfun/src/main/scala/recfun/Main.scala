@@ -11,12 +11,12 @@ object Main {
 //        print(pascal(col, row) + " ")
 //      println()
 //    }
-    println(balance("())(".toList))
-    println(balance("((()))".toList))
-    println(balance("()()()".toList))
-    println(balance("(if (zero? x) max (/ 1 x))".toList))
-    println(balance("I told him (that it’s not (yet) done). (But he wasn’t listening)".toList))
-    println(balance(":-)".toList))
+//    println(balance("((if (zero? x) max (/ 1 x))".toList))
+//    println(balance("I told him (that it's not (yet) done).\n(But he wasn't listening)".toList))
+//    println(balance(":-)".toList))
+//    println(balance("())(".toList))
+//    println(balance("()()((()))".toList))
+    println(countChange(4, List(1,2)))
   }
 
   /**
@@ -30,6 +30,7 @@ object Main {
   /**
    * Exercise 2
    */
+  @tailrec
   def balance(chars: List[Char]): Boolean = {
     val length = chars.length;
 
@@ -69,6 +70,8 @@ object Main {
    * Exercise 3
    */
   def countChange(money: Int, coins: List[Int]): Int = {
-    1
+    if (money == 0) 1
+    else if (money < 0 || coins.isEmpty) 0
+    else countChange(money - coins.head, coins) + countChange(money, coins.tail)
   }
 }
