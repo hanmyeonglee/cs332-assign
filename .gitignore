@@ -2,8 +2,16 @@
 .idea/
 
 # by-products while building
+target/
+project/target/
+project/project/project/
+project/project/target/
 .bsp/
-.scala-build/
+.metals/
+.ammonite/
+.ivy2/
+.cache/
+.coursier/
 *.class
 
 # scala installation test code
