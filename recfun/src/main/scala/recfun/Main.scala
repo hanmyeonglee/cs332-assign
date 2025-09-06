@@ -36,13 +36,13 @@ object Main {
    */
   def balance(chars: List[Char]): Boolean = {
     @tailrec
-    def _balance(chars: List[Char], count: Int): Boolean =
+    def _balance(chars: List[Char], nofParens: Int): Boolean =
       chars match {
-        case _ if count < 0 => false
-        case Nil => count == 0
-        case '(' :: chars => _balance(chars, count + 1)
-        case ')' :: chars => _balance(chars, count - 1)
-        case _ :: chars => _balance(chars, count)
+        case _ if nofParens < 0 => false
+        case Nil => nofParens == 0
+        case '(' :: tailChars => _balance(tailChars, nofParens + 1)
+        case ')' :: tailChars => _balance(tailChars, nofParens - 1)
+        case _ :: tailChars => _balance(tailChars, nofParens)
       }
 
     _balance(chars, 0);
