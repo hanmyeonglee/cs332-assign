@@ -25,11 +25,9 @@ object Main {
    * Exercise 1
    */
   def pascal(c: Int, r: Int): Int =
-  (c, r) match {
-    case (0, 0) => 1
-    case (col, row) if col < 0 || col > row => 0
-    case (col, row) => pascal(col - 1, row - 1) + pascal(col, row - 1)
-  }
+    if (c < 0 || c > r) 0
+    else if (c == 0 || c == r) 1
+    else pascal(c - 1, r - 1) + pascal(c, r - 1)
 
   /**
    * Exercise 2
