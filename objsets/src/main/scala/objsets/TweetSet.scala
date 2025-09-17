@@ -210,7 +210,6 @@ object GoogleVsApple {
 
   lazy val googleTweets: TweetSet = keywordContainingTweets(google)
   lazy val appleTweets: TweetSet = keywordContainingTweets(apple)
-  println("intialized")
 
   /**
    * A list of all tweets mentioning a keyword from either apple or google,
