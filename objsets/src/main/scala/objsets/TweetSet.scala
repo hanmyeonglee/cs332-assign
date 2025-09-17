@@ -78,15 +78,16 @@ abstract class TweetSet {
    * and be implemented in the subclasses?
    */
   def descendingByRetweet: TweetList = {
-    val tweetSet = this.filter(_ => true)
+    val initialTweetSet = this
     new Iterator[Tweet] {
+      private var tweetSet = initialTweetSet
       private var nextTweet: Option[Tweet] = None
       def hasNext: Boolean = try {
         nextTweet = Some(tweetSet.mostRetweeted)
         true
       } catch { case _: java.util.NoSuchElementException => false }
       def next(): Tweet = {
-        tweetSet.remove(nextTweet.get)
+        tweetSet = tweetSet.remove(nextTweet.get)
         nextTweet.get
       }
     }.foldRight(Nil: TweetList)((tweet, acc) => new Cons(tweet, acc))
@@ -209,7 +210,8 @@ object GoogleVsApple {
 
   lazy val googleTweets: TweetSet = keywordContainingTweets(google)
   lazy val appleTweets: TweetSet = keywordContainingTweets(apple)
-  
+  println("intialized")
+
   /**
    * A list of all tweets mentioning a keyword from either apple or google,
    * sorted by the number of retweets.
