@@ -55,7 +55,7 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def union(that: TweetSet): TweetSet = this.filterAcc(x => !that.contains(x), that.filter(_ => true))
+  def union(that: TweetSet): TweetSet = this.filterAcc(_ => true, that)
   
   /**
    * Returns the tweet from this set which has the greatest retweet count.
@@ -90,7 +90,7 @@ abstract class TweetSet {
         tweetSet = tweetSet.remove(nextTweet.get)
         nextTweet.get
       }
-    }.foldRight(Nil: TweetList)((tweet, acc) => new Cons(tweet, acc))
+    }.toList.reverseIterator.foldLeft(Nil: TweetList)((acc, tw) => new Cons(tw, acc))
   }
   
   /**
@@ -125,7 +125,7 @@ class Empty extends TweetSet {
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
-  def mostRetweeted: Tweet = throw new NoSuchElementException
+  def mostRetweeted: Tweet = throw new java.util.NoSuchElementException
   
   /**
    * The following methods are already implemented
