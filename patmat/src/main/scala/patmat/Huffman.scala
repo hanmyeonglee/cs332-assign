@@ -40,7 +40,6 @@ object Huffman {
     Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
 
 
-
   // Part 2: Generating Huffman trees
 
   /**
@@ -101,7 +100,19 @@ object Huffman {
   /**
    * Checks whether the list `trees` contains only one single code tree.
    */
-  def singleton(trees: List[CodeTree]): Boolean = ???
+  def singleton(trees: List[CodeTree]): Boolean = {
+    @tailrec
+    def _singleton(treeStack: List[CodeTree], tree: CodeTree): Boolean = treeStack match {
+      case Nil => false
+      case t :: ts => if (t == tree) true else t match {
+        case Fork(l, r, _, _) => _singleton(ts :: List(l, r), tree)
+        case Leaf(_, _) => _singleton(ts, tree)
+      }
+    }
+
+    val root = trees.max(Ordering.by(weight))
+    trees.forall(_singleton(List(root), _))
+  }
   
   /**
    * The parameter `trees` of this function is a list of code trees ordered
