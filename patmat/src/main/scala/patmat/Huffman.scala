@@ -207,14 +207,15 @@ object Huffman {
    */
   def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
     val bitMap: Map[Char, List[Bit]] = {
-      def _buildBitMap(currentTree: CodeTree, path: List[Bit], acc: Map[Char, List[Bit]]): Map[Char, List[Bit]] = currentTree match {
-        case Leaf(ch, _) => acc + (ch -> path)
-        case Fork(left, right, _, _) =>
-          val leftMap = _buildBitMap(left, path :+ 0, acc)
-          _buildBitMap(right, path :+ 1, leftMap)
+      @tailrec
+      def _buildBitMap(stack: List[(CodeTree, List[Bit])], acc: Map[Char, List[Bit]]): Map[Char, List[Bit]] = stack match {
+        case Nil => acc
+        case (Leaf(ch, _), bits) :: xs => _buildBitMap(xs, acc + (ch -> bits))
+        case (Fork(left, right, _, _), bits) :: xs =>
+          _buildBitMap((left, bits :+ 0) :: (right, bits :+ 1) :: xs, acc)
       }
 
-      _buildBitMap(tree, List(), Map())
+      _buildBitMap(List((tree, Nil)), Map())
     }
 
     text.flatMap(ch => bitMap.getOrElse(ch, Nil))
@@ -238,7 +239,17 @@ object Huffman {
    * a valid code tree that can be represented as a code table. Using the code tables of the
    * sub-trees, think of how to build the code table for the entire tree.
    */
-  def convert(tree: CodeTree): CodeTable = ???
+  def convert(tree: CodeTree): CodeTable = {
+    @tailrec
+    def _convert(stack: List[(CodeTree, List[Int])], acc: CodeTable): CodeTable = stack match {
+      case Nil => acc
+      case (Leaf(ch, _), bits) :: xs => _convert(xs, (ch, bits) :: acc)
+      case (Fork(left, right, _, _), bits) :: xs =>
+        _convert((left, bits :+ 0) :: (right, bits :+ 1) :: xs, acc)
+    }
+
+    _convert(List((tree, Nil)), Nil)
+  }
 
   /**
    * This function takes two code tables and merges them into one. Depending on how you
