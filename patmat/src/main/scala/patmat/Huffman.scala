@@ -117,14 +117,12 @@ object Huffman {
    * If `trees` is a list of less than two elements, that list should be returned
    * unchanged.
    */
-  def combine(trees: List[CodeTree]): List[CodeTree] = {
-    if (trees.length < 2) trees
-    else {
-      val left = trees(0)
-      val right = trees(1)
+  def combine(trees: List[CodeTree]): List[CodeTree] = trees match {
+    case left :: right :: tail =>
       val fork = makeCodeTree(left, right)
-      (trees.drop(2) :+ fork).sortBy(weight)
-    }
+      val (before, after) = tail.span(t => weight(t) < weight(fork))
+      before ::: fork :: after
+    case _ => trees
   }
   
   /**
@@ -170,14 +168,14 @@ object Huffman {
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
     @tailrec
     def _decode(currentTree: CodeTree, bits: List[Bit], acc: List[Char]): List[Char] = (currentTree, bits) match {
-      case (Leaf(ch, _), Nil) => acc :+ ch
-      case (Leaf(ch, _), _)   => _decode(tree, bits, acc :+ ch)
+      case (Leaf(ch, _), Nil) => ch :: acc
+      case (Leaf(ch, _), _)   => _decode(tree, bits, ch :: acc)
       case (Fork(left, right, _, _), 0 :: bs) => _decode(left, bs, acc)
       case (Fork(left, right, _, _), 1 :: bs) => _decode(right, bs, acc)
       case _ => acc
     }
 
-    _decode(tree, bits, List())
+    _decode(tree, bits, List()).reverse
   }
 
   /**
@@ -210,9 +208,9 @@ object Huffman {
       @tailrec
       def _buildBitMap(stack: List[(CodeTree, List[Bit])], acc: Map[Char, List[Bit]]): Map[Char, List[Bit]] = stack match {
         case Nil => acc
-        case (Leaf(ch, _), bits) :: xs => _buildBitMap(xs, acc + (ch -> bits))
+        case (Leaf(ch, _), bits) :: xs => _buildBitMap(xs, acc + (ch -> bits.reverse))
         case (Fork(left, right, _, _), bits) :: xs =>
-          _buildBitMap((left, bits :+ 0) :: (right, bits :+ 1) :: xs, acc)
+          _buildBitMap((left, 0 :: bits) :: (right, 1 :: bits) :: xs, acc)
       }
 
       _buildBitMap(List((tree, Nil)), Map())
@@ -243,9 +241,9 @@ object Huffman {
     @tailrec
     def _convert(stack: List[(CodeTree, List[Int])], acc: CodeTable): CodeTable = stack match {
       case Nil => acc
-      case (Leaf(ch, _), bits) :: xs => _convert(xs, mergeCodeTables(List((ch, bits)), acc))
+      case (Leaf(ch, _), bits) :: xs => _convert(xs, mergeCodeTables(List((ch, bits.reverse)), acc))
       case (Fork(left, right, _, _), bits) :: xs =>
-        _convert((left, bits :+ 0) :: (right, bits :+ 1) :: xs, acc)
+        _convert((left, 0 :: bits) :: (right, 1 :: bits) :: xs, acc)
     }
 
     _convert(List((tree, Nil)), Nil)
@@ -265,7 +263,7 @@ object Huffman {
    * and then uses it to perform the actual encoding.
    */
   def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = {
-    val codeTable = convert(tree)
-    text.flatMap(ch => codeBits(codeTable)(ch))
+    val codeMap = convert(tree).toMap
+    text.flatMap(ch => codeMap.getOrElse(ch, Nil))
   }
 }
