@@ -205,7 +205,20 @@ object Huffman {
    * This function encodes `text` using the code tree `tree`
    * into a sequence of bits.
    */
-  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+    val bitMap: Map[Char, List[Bit]] = {
+      def _buildBitMap(currentTree: CodeTree, path: List[Bit], acc: Map[Char, List[Bit]]): Map[Char, List[Bit]] = currentTree match {
+        case Leaf(ch, _) => acc + (ch -> path)
+        case Fork(left, right, _, _) =>
+          val leftMap = _buildBitMap(left, path :+ 0, acc)
+          _buildBitMap(right, path :+ 1, leftMap)
+      }
+
+      _buildBitMap(tree, List(), Map())
+    }
+
+    text.flatMap(ch => bitMap.getOrElse(ch, Nil))
+  }
 
   // Part 4b: Encoding using code table
 
