@@ -100,18 +100,9 @@ object Huffman {
   /**
    * Checks whether the list `trees` contains only one single code tree.
    */
-  def singleton(trees: List[CodeTree]): Boolean = {
-    @tailrec
-    def _singleton(treeStack: List[CodeTree], tree: CodeTree): Boolean = treeStack match {
-      case Nil => false
-      case t :: ts => if (t == tree) true else t match {
-        case Fork(l, r, _, _) => _singleton(ts :: List(l, r), tree)
-        case Leaf(_, _) => _singleton(ts, tree)
-      }
-    }
-
-    val root = trees.max(Ordering.by(weight))
-    trees.forall(_singleton(List(root), _))
+  def singleton(trees: List[CodeTree]): Boolean = trees match {
+    case _ :: Nil => true
+    case _        => false
   }
   
   /**
