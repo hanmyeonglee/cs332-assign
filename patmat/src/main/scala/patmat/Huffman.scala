@@ -76,15 +76,7 @@ object Huffman {
    *       println("integer is  : "+ theInt)
    *   }
    */
-  def times(chars: List[Char]): List[(Char, Int)] = {
-    @tailrec
-    def _times(chars: List[Char], charsMap: Map[Char, Int]): List[(Char, Int)] = chars match {
-      case Nil => charsMap.toList
-      case ch :: chs => _times(chs, charsMap + (ch -> (charsMap.getOrElse(ch, 0) + 1)))
-    }
-
-    _times(chars, Map())
-  }
+  def times(chars: List[Char]): List[(Char, Int)] = chars.groupBy(identity).map { case (char, occurrences) => (char, occurrences.length) }.toList
   
   /**
    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
@@ -154,7 +146,9 @@ object Huffman {
    * The parameter `chars` is an arbitrary text. This function extracts the character
    * frequencies from that text and creates a code tree based on them.
    */
-  def createCodeTree(chars: List[Char]): CodeTree = until(singleton, combine)(makeOrderedLeafList(times(chars))).head
+  def createCodeTree(chars: List[Char]): CodeTree =
+    if (chars.nonEmpty) until(singleton, combine)(makeOrderedLeafList(times(chars))).head
+    else throw new IllegalArgumentException("chars cannot be empty")
 
 
   // Part 3: Decoding
@@ -170,9 +164,9 @@ object Huffman {
     def _decode(currentTree: CodeTree, bits: List[Bit], acc: List[Char]): List[Char] = (currentTree, bits) match {
       case (Leaf(ch, _), Nil) => ch :: acc
       case (Leaf(ch, _), _)   => _decode(tree, bits, ch :: acc)
-      case (Fork(left, right, _, _), 0 :: bs) => _decode(left, bs, acc)
-      case (Fork(left, right, _, _), 1 :: bs) => _decode(right, bs, acc)
-      case _ => acc
+      case (Fork(l, _, _, _), 0 :: bs) => _decode(l, bs, acc)
+      case (Fork(_, r, _, _), 1 :: bs) => _decode(r, bs, acc)
+      case _ => throw new IllegalArgumentException("invalid bit sequence")
     }
 
     _decode(tree, bits, List()).reverse
@@ -227,7 +221,7 @@ object Huffman {
    * This function returns the bit sequence that represents the character `char` in
    * the code table `table`.
    */
-  def codeBits(table: CodeTable)(char: Char): List[Bit] = table.toMap.getOrElse(char, Nil)
+  def codeBits(table: CodeTable)(char: Char): List[Bit] = table.find(_._1 == char).map(_._2).getOrElse(Nil)
 
   /**
    * Given a code tree, create a code table which contains, for every character in the
@@ -241,7 +235,7 @@ object Huffman {
     @tailrec
     def _convert(stack: List[(CodeTree, List[Int])], acc: CodeTable): CodeTable = stack match {
       case Nil => acc
-      case (Leaf(ch, _), bits) :: xs => _convert(xs, mergeCodeTables(List((ch, bits.reverse)), acc))
+      case (Leaf(ch, _), bits) :: xs => _convert(xs, (ch, bits.reverse) :: acc)
       case (Fork(left, right, _, _), bits) :: xs =>
         _convert((left, 0 :: bits) :: (right, 1 :: bits) :: xs, acc)
     }
