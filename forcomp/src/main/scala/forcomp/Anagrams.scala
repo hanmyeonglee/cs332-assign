@@ -86,23 +86,13 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = {
-    @tailrec
-    def _combinations(occurrences: Occurrences, acc: List[Occurrences]): List[Occurrences] = occurrences match {
-      case Nil => acc
-      case (char, count) :: rest =>
-        val newCombs = for {
-          comb <- acc
-          n <- 0 to count
-        } yield {
-          if (n == 0) comb
-          else (char, n) :: comb
-        }
-        _combinations(rest, newCombs)
+  def combinations(occurrences: Occurrences): List[Occurrences] =
+    occurrences.foldRight(List[Occurrences](Nil)) { case ((char, count), acc) =>
+      for {
+        comb <- acc
+        n <- 0 to count
+      } yield if (n > 0) (char, n) :: comb else comb
     }
-
-    _combinations(occurrences, List(Nil)).map(_.sortBy(_._1))
-  }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
@@ -162,18 +152,17 @@ object Anagrams {
    *  Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    val memo = collection.mutable.Map[Occurrences, List[Sentence]]()
-
-    def _sentenceAnagrams(occurrences: Occurrences): List[Sentence] =
-      memo.getOrElseUpdate(occurrences,
-        if (occurrences.isEmpty) List(Nil)
-        else for {
+    def _sentenceAnagrams(occurrences: Occurrences): List[Sentence] = {
+      if (occurrences.isEmpty) List(Nil)
+      else {
+        for {
           combo <- combinations(occurrences)
           if combo.nonEmpty
           word <- dictionaryByOccurrences(combo)
           rest <- _sentenceAnagrams(subtract(occurrences, combo))
         } yield word :: rest
-      )
+      }
+    }
 
     _sentenceAnagrams(sentenceOccurrences(sentence))
   }
