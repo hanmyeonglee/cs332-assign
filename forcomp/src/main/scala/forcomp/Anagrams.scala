@@ -162,17 +162,18 @@ object Anagrams {
    *  Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    def _sentenceAnagrams(occurrences: Occurrences): List[Sentence] = {
-      if (occurrences.isEmpty) List(Nil)
-      else {
-        for {
+    val memo = collection.mutable.Map[Occurrences, List[Sentence]]()
+
+    def _sentenceAnagrams(occurrences: Occurrences): List[Sentence] =
+      memo.getOrElseUpdate(occurrences,
+        if (occurrences.isEmpty) List(Nil)
+        else for {
           combo <- combinations(occurrences)
           if combo.nonEmpty
           word <- dictionaryByOccurrences(combo)
           rest <- _sentenceAnagrams(subtract(occurrences, combo))
         } yield word :: rest
-      }
-    }
+      )
 
     _sentenceAnagrams(sentenceOccurrences(sentence))
   }
