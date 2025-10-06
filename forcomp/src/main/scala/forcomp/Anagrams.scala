@@ -86,16 +86,22 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = occurrences match {
-    case Nil => List(Nil)
-    case (char, count) :: xs =>
-      for {
-        comb <- combinations(xs)
-        n <- 0 to count
-      } yield {
-        if (n == 0) comb
-        else (char, n) :: comb
-      }
+  def combinations(occurrences: Occurrences): List[Occurrences] = {
+    @tailrec
+    def _combinations(occurrences: Occurrences, acc: List[Occurrences]): List[Occurrences] = occurrences match {
+      case Nil => acc
+      case (char, count) :: rest =>
+        val newCombs = for {
+          comb <- acc
+          n <- 0 to count
+        } yield {
+          if (n == 0) comb
+          else (char, n) :: comb
+        }
+        _combinations(rest, newCombs)
+    }
+
+    _combinations(occurrences, List(Nil)).map(_.sortBy(_._1))
   }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
@@ -110,8 +116,9 @@ object Anagrams {
    */
   def subtract(x: Occurrences, y: Occurrences): Occurrences = {
     val yMap = y.toMap.withDefaultValue(0)
-    x.map { case (char, count) => (char, count - yMap(char)) }
-      .filter { case (_, count) => count > 0 }
+    x.collect { case (char, count) if count - yMap(char) > 0 =>
+      (char, count - yMap(char))
+    }
   }
 
   /** Returns a list of all anagram sentences of the given sentence.
