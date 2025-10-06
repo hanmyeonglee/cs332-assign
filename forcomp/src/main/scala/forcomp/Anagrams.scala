@@ -95,7 +95,7 @@ object Anagrams {
           comb <- acc
           n <- 1 to count
         } yield (char, n) :: comb
-        _combinations(rest, acc ++ newCombs)
+        _combinations(rest, newCombs.foldLeft(acc)((a, comb) => comb :: a))
     }
 
     _combinations(occurrences, List(Nil)).map(_.sortBy(_._1)).distinct
