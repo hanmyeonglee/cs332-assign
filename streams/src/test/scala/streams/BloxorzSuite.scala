@@ -98,7 +98,7 @@ class BloxorzSuite extends FunSuite {
       val expected = Set(
         (Block(Pos(2,1), Pos(3,1)), List(Down, Left, Up))
       )
-      assert(newNeighborsOnly(neighbors.toStream, explored) === expected.toStream)
+      assert(newNeighborsOnly(neighbors.toStream, explored).toSet === expected)
     }
   }
 
