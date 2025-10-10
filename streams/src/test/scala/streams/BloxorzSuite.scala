@@ -87,4 +87,19 @@ class BloxorzSuite extends FunSuite {
     }
   }
 
+
+  test("reducing duplicated positions") {
+    new Level1 {
+      val neighbors = Set(
+        (Block(Pos(1,2), Pos(1,3)), List(Right, Left, Up)),
+        (Block(Pos(2,1), Pos(3,1)), List(Down, Left, Up))
+      )
+      val explored = Set(Block(Pos(1,1), Pos(1,1)), Block(Pos(1,2), Pos(1,3)))
+      val expected = Set(
+        (Block(Pos(2,1), Pos(3,1)), List(Down, Left, Up))
+      )
+      assert(newNeighborsOnly(neighbors.toStream, explored) === expected.toStream)
+    }
+  }
+
 }
