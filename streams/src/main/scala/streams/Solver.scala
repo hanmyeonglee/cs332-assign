@@ -2,8 +2,6 @@ package streams
 
 import common._
 
-import scala.annotation.tailrec
-
 /**
  * This component implements the solver for the Bloxorz game
  */
