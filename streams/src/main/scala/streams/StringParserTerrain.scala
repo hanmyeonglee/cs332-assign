@@ -64,6 +64,7 @@ trait StringParserTerrain extends GameDef {
    */
   def findChar(c: Char, levelVector: Vector[Vector[Char]]): Pos = {
     val row = levelVector.indexWhere(_.contains(c))
+    require(row != -1, s"Character $c not found in level")
     val col = levelVector(row).indexOf(c)
     Pos(row, col)
   }
