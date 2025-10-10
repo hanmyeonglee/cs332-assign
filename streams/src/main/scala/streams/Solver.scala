@@ -2,6 +2,8 @@ package streams
 
 import common._
 
+import scala.annotation.tailrec
+
 /**
  * This component implements the solver for the Bloxorz game
  */
@@ -66,7 +68,16 @@ trait Solver extends GameDef {
    * construct the correctly sorted stream.
    */
   def from(initial: Stream[(Block, List[Move])],
-           explored: Set[Block]): Stream[(Block, List[Move])] = ???
+           explored: Set[Block]): Stream[(Block, List[Move])] = {
+    if (initial.isEmpty) Stream.empty
+    else {
+      val more = for {
+        (block, history) <- initial
+        next <- newNeighborsOnly(neighborsWithHistory(block, history), explored)
+      } yield next
+      initial #::: from(more, explored ++ (more map (_._1)))
+    }
+  }
 
   /**
    * The stream of all paths that begin at the starting block.
