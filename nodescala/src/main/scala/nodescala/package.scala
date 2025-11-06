@@ -82,11 +82,12 @@ package object nodescala {
      *  However, it is also non-deterministic -- it may throw or return a value
      *  depending on the current state of the `Future`.
      */
-    def now: T = f.value match {
-      case Some(Success(v)) => v
-      case Some(Failure(e)) => throw e
-      case None => throw new NoSuchElementException("Future not completed")
-    }
+    def now: T =
+      try {
+        Await.result(f, Duration.Zero)
+      } catch {
+        case _: Exception => throw new NoSuchElementException("Future not completed")
+      }
 
     /** Continues the computation of this future by taking the current future
      *  and mapping it into another future.
