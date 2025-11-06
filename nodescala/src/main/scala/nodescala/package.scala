@@ -95,10 +95,11 @@ package object nodescala {
      *  The function `cont` is called only after the current future completes.
      *  The resulting future contains a value returned by `cont`.
      */
-    def continueWith[S](cont: Future[T] => S): Future[S] = f.transform(
-      _ => cont(f),
-      e => e
-    )
+    def continueWith[S](cont: Future[T] => S): Future[S] =
+      f.transform(
+        _ => cont(f),
+        e => e
+      )
 
     /** Continues the computation of this future by taking the result
      *  of the current future and mapping it into another future.
