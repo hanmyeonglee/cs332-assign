@@ -52,7 +52,32 @@ trait NodeScala {
    *  @param handler        a function mapping a request to a response
    *  @return               a subscription that can stop the server and all its asynchronous operations *entirely*
    */
-  def start(relativePath: String)(handler: Request => Response): Subscription = ???
+  def start(relativePath: String)(handler: Request => Response): Subscription = {
+    val listener = createListener(relativePath)
+    val subscription = listener.start()
+    val cts: CancellationTokenSource = CancellationTokenSource()
+
+    def processRequests(): Unit = {
+      if (cts.cancellationToken.nonCancelled) {
+        listener.nextRequest().onSuccess {
+          case (request, exchange) =>
+            Future {
+              respond(exchange, cts.cancellationToken, handler(request))
+            }
+            processRequests()
+        }
+      }
+    }
+
+    processRequests()
+
+    new Subscription {
+      def unsubscribe(): Unit = {
+        cts.unsubscribe()
+        subscription.unsubscribe()
+      }
+    }
+  }
 
 }
 
