@@ -1,5 +1,6 @@
 # IDE settings
 .idea/
+.vscode/
 
 # by-products while building
 target/
