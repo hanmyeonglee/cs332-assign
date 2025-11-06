@@ -36,7 +36,7 @@ trait NodeScala {
         if token.nonCancelled
       ) exchange.write(part)
     } catch {
-      case ex: Exception => println("Exception responding: " + ex.getMessage)
+      case ex: Exception => ex.printStackTrace()
     } finally {
       exchange.close()
     }
