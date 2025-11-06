@@ -71,12 +71,7 @@ trait NodeScala {
 
     processRequests()
 
-    new Subscription {
-      def unsubscribe(): Unit = {
-        cts.unsubscribe()
-        subscription.unsubscribe()
-      }
-    }
+    Subscription(cts, subscription)
   }
 
 }
